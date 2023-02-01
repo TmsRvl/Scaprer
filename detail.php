@@ -2,8 +2,8 @@
 libxml_use_internal_errors(true);
 $url = "https://www.legabasket.it";
 
-if(isset($_GET['d'])){
-    $url .= $_GET['d'];
+if(isset($_REQUEST['d'])){
+    $url .= $_REQUEST['d'];
 }else{
     die('Fatal error');
 }

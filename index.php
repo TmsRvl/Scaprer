@@ -1,7 +1,13 @@
 <?php
-$url = "https://www.legabasket.it/lba/6/calendario?";
 /* Use internal libxml errors -- turn on in production, off for debugging */
 libxml_use_internal_errors(true);
+
+if(isset($_REQUEST['d'])){
+    $url = "https://www.legabasket.it/lba/6/calendario?d=".$_REQUEST['d'];    
+}else{
+    $url = "https://www.legabasket.it/lba/6/calendario?";
+}
+
 $dom = new DomDocument;
 $dom->loadHTMLFile($url);
 
@@ -22,17 +28,23 @@ foreach ($xpath->query("//li[@class='page-item active']//a//text()") as $key => 
     break;
 }
 
-for($i = 0; $i < (sizeof($nodes)/3); $i++){
+$data = [];
+foreach ($nodes as $key => $value) {
+    if(!str_contains(format($value->nodeValue), 'd.t.s'))
+        $data[] = format($value->nodeValue);
+}
+
+for($i = 0; $i < (sizeof($data)/3); $i++){
     $output["Games"][$i] = array(
-        $titles[0]->nodeValue => format($nodes[$i*3]->nodeValue),
-        $titles[1]->nodeValue => format($nodes[($i*3)+1]->nodeValue),
-        $titles[2]->nodeValue => format($nodes[($i*3)+2]->nodeValue),
+        $titles[0]->nodeValue => $data[$i*3],
+        $titles[1]->nodeValue => $data[($i*3)+1],
+        $titles[2]->nodeValue => $data[($i*3)+2],
         $titles[4]->nodeValue => format($info[$i*4]->nodeValue.', '.$info[($i*4)+1]->nodeValue),
         $titles[5]->nodeValue => format($info[($i*4)+2]->nodeValue.', '.$info[($i*4)+3]->nodeValue)
     );
     $output["Games"][$i]["info"] = array(
-        $titles[0]->nodeValue => $squads[format($nodes[$i*3]->nodeValue)],
-        $titles[2]->nodeValue => $squads[format($nodes[($i*3)+2]->nodeValue)]
+        $titles[0]->nodeValue => $squads[$data[$i*3]],
+        $titles[2]->nodeValue => $squads[$data[($i*3)+2]]
     );
 }
 
