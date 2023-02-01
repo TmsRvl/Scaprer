@@ -18,7 +18,7 @@ $info = $xpath->query("//td[@class='small']//text()");
 
 
 $output;
-$a = getSquadInfo();
+$squads = getSquadInfo();
 
 for($i = 0; $i < (sizeof($nodes)/3); $i++){
     $output["games"][$i] = array(
@@ -29,8 +29,8 @@ for($i = 0; $i < (sizeof($nodes)/3); $i++){
         $titles[5]->nodeValue => format($info[($i*4)+2]->nodeValue.', '.$info[($i*4)+3]->nodeValue)
     );
     $output["games"][$i]["info"] = array(
-        $titles[0]->nodeValue => $a[format($nodes[$i*3]->nodeValue)],
-        $titles[2]->nodeValue => $a[format($nodes[($i*3)+2]->nodeValue)]
+        $titles[0]->nodeValue => getSquadRoster($squads[format($nodes[$i*3]->nodeValue)]),
+        $titles[2]->nodeValue => getSquadRoster($squads[format($nodes[($i*3)+2]->nodeValue)])
     );
 }
 
@@ -69,15 +69,53 @@ function getSquadRoster($url){
 
     $xpath = new DomXPath($dom);
 
-    //ritorna le squadre
-    $titles = $xpath->query("//div[@class='row']//div//div//div//a//h5//text()");
-    //ritorna i link di dettaglio
-    $link = $xpath->query("//a[@rel='bookmark']//@href");
+    //ritorna i titoli
+    $titles = $xpath->query("//div[@id='team']//th//text()");
+    //ritorna i dettagli dei giocatori
+    $link = $xpath->query("//div[@id='team']//td//text()");
+    header("Content-type: text/plain");
 
-    $out;
-    for($i = 0; $i < sizeof($titles); $i++){
-        $out[format($titles[$i]->nodeValue)] = "https://www.legabasket.it" . $link[$i]->nodeValue;
+    $keys;
+    $values;
+    $out; 
+
+    foreach ($titles as $i => $node) {
+        if(!removeWhiteSpace($node->nodeValue) == '')
+            $keys[] = $node->nodeValue;
     }
+
+    $j = 0;
+    foreach ($link as $i => $node) {
+        if($j < 2){
+            if(is_numeric(removeWhiteSpace($node->nodeValue)) || !removeWhiteSpace($node->nodeValue) == ''){
+                $out[$keys[0]] .= removeWhiteSpace($node->nodeValue) . " ";
+                $j++;
+            }
+        }else{
+            if(is_numeric(removeWhiteSpace($node->nodeValue)) || !removeWhiteSpace($node->nodeValue) == '')
+                $values[] = removeWhiteSpace($node->nodeValue);
+        }
+    }
+
+    for($i=0; $i<(sizeof($values)/8); $i++){
+        $i = (is_numeric($values[($i*8)])) ? $i : $i-1;
+        $out[$keys[1]][$i] = array(
+            $keys[2] => (is_numeric($values[($i*8)])) ? $values[($i*8)] : '-',
+            $keys[3] => $values[($i*8)+1] . " " . $values[($i*8)+2],
+            $keys[4] => $values[($i*8)+3],
+            $keys[5] => $values[($i*8)+4],
+            $keys[6] => $values[($i*8)+5],
+            $keys[7] => $values[($i*8)+6],
+            $keys[8] => $values[($i*8)+7]
+        );
+    }
+
     return $out;
+}
+
+function removeWhiteSpace($text){
+    $text = preg_replace('/\s+/', ' ', $text);
+    $text = trim($text);
+    return $text;
 }
 ?>
