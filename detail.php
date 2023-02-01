@@ -1,6 +1,13 @@
 <?php
 libxml_use_internal_errors(true);
-$url = "https://www.legabasket.it/lba/squadre/2022/1533/ea7-emporio-armani-milano";
+$url = "https://www.legabasket.it";
+
+if(isset($_GET['d'])){
+    $url .= $_GET['d'];
+}else{
+    die('Fatal error');
+}
+
 $dom = new DomDocument;
 $dom->loadHTMLFile($url);
 
@@ -10,23 +17,41 @@ $xpath = new DomXPath($dom);
 $titles = $xpath->query("//div[@id='team']//th//text()");
 //ritorna i dettagli dei giocatori
 $link = $xpath->query("//div[@id='team']//td//text()");
-header("Content-type: text/plain");
+//images
+$imgs = $xpath->query("//div[@id='team']//td//div//div[@class='img']//@style");
+
+$icons = [];
+foreach ($imgs as $key => $value) {
+    $a = $value->nodeValue; 
+    $a = substr($a, strpos($a,"'")+1);
+    $icons[] = substr($a, 0, strpos($a,"'")); 
+}
 
 $keys;
 $values;
-$out = []; 
+$out = [];
+foreach ($xpath->query("//h1[@itemprop='sport']//text()") as $key => $value) {
+    $out['Name'] = removeWhiteSpace($value->nodeValue);
+    break;
+}
+foreach ($xpath->query("//div[@class='team-logo']//img//@src") as $key => $value) {
+    $out['Logo'] = $value->nodeValue;
+    break;
+}
 
 foreach ($titles as $i => $node) {
     if(!removeWhiteSpace($node->nodeValue) == '')
         $keys[] = $node->nodeValue;
 }
 
+$out[$keys[0]]['Displayed_icon'] = $icons[0];
+
 $j = 0;
 $n = 0;
 foreach ($link as $i => $node) {
     if($j < 2){
         if(is_numeric(removeWhiteSpace($node->nodeValue)) || !removeWhiteSpace($node->nodeValue) == ''){
-            $out[$keys[0]] = (!isset($out[$keys[0]])) ? removeWhiteSpace($node->nodeValue) : $out[$keys[0]].' '. removeWhiteSpace($node->nodeValue);
+            $out[$keys[0]]['Name'] = (!isset($out[$keys[0]]['Name'])) ? removeWhiteSpace($node->nodeValue) : $out[$keys[0]]['Name'].' '. removeWhiteSpace($node->nodeValue);
             $j++;
         }
     }else{
@@ -46,13 +71,12 @@ foreach ($link as $i => $node) {
 $missing = 0;
 for($i=0; $i<(sizeof($values)/8); $i++){    
     $index = $i*8;
-    echo $values[$index] . " ";
     if(!is_numeric($values[$index])) {
         $index -= $missing+1;
         $missing++;
     }
-    echo $values[$index] . "|";
     $out[$keys[1]][$i] = array(
+        'Displayed_icon' => $icons [$i+1],
         $keys[2] => (!is_numeric($values[$index]))? '-' : $values[$index],
         $keys[3] => $values[$index+1] . " " . $values[$index+2],
         $keys[4] => $values[$index+3],
@@ -63,7 +87,9 @@ for($i=0; $i<(sizeof($values)/8); $i++){
     );
 }
 
-print_r($out);
+header("Content-Type: application/json");
+echo json_encode($out);
+exit();
 
 function removeWhiteSpace($text){
     $text = preg_replace('/\s+/', ' ', $text);
