@@ -49,6 +49,7 @@ for($i = 0; $i < (sizeof($data)/3); $i++){
 }
 
 header("Access-Control-Allow-Origin: *");
+header('Content-Type: application/json');
 echo json_encode($output);
 
 
