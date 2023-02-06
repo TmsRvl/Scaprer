@@ -48,9 +48,9 @@ for($i = 0; $i < (sizeof($data)/3); $i++){
     );
 }
 
-header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
 echo json_encode($output);
-exit();
+
 
 function format($str){
     $str = preg_replace('/\s\s+/', ' ', $str);

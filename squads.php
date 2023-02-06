@@ -1,5 +1,6 @@
 <?php
 libxml_use_internal_errors(true);
+header("Access-Control-Allow-Origin:*");
 $url = "https://www.legabasket.it/lba/3/squadre";
 
 $dom = new DomDocument;

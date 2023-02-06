@@ -1,5 +1,6 @@
 <?php
 libxml_use_internal_errors(true);
+header("Access-Control-Allow-Origin:*");
 $url = "https://www.legabasket.it";
 
 if(isset($_REQUEST['d'])){
