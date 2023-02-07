@@ -12,7 +12,6 @@ function loadNav(number) {
 }
 
 function loadPage({day = ''} = {}){
-    console.log(day);
     fetch("http://localhost/esercizi/scraper?d="+day)
         .then((response) => response.json())
         .then((data) => {
@@ -22,7 +21,6 @@ function loadPage({day = ''} = {}){
 }
 
 function loadTable(data){
-    console.log(data);
     document.querySelector(".body").innerHTML = "";
     var tbl = document.createElement('table');
     var tbdy = document.createElement('tbody');
@@ -56,5 +54,10 @@ function loadTable(data){
 }
 
 function loadMatchDetail(squads) {
-    console.log(squads);
+    document.querySelector(".detail").innerHTML = "";
+    fetch("http://localhost/esercizi/scraper/detail.php?d="+squads['Squadra di casa'])
+        .then((response) => response.json())
+        .then((data) => {
+            
+        });   
 }
