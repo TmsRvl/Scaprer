@@ -23,18 +23,20 @@ div.nav button.active{
 }
 
 div.nav{
-    width: 100%;
+    width: 98%;
     text-align: center;
     border-radius: 10px;
     border: 1px solid black;
     padding-top: 1%;
     padding-bottom: 1%;
+    margin-inline: 1%;
 }
 
 div.body{
     margin-top: 3%;
     width: 100%;
-    padding-inline: 1%;
+    display: flex;
+    justify-content: center;
 }
 
 div.body table{
@@ -61,6 +63,10 @@ div.body td button{
 
 div.body td button:hover{
     background-color: lightgray;
+}
+
+div.detail{
+    margin-top: 3%;
 }
 
 div.detail img#logo{
