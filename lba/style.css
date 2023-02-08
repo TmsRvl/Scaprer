@@ -85,3 +85,13 @@ div.detail td{
 div.detail td table{
     border-collapse: collapse;
 }
+
+div.detail > table > tbody > tr > td{
+    border: none;
+}
+
+div.detail > table{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}

@@ -12,7 +12,7 @@ function loadNav(number) {
 }
 
 function loadPage({day = ''} = {}){
-    fetch("http://localhost/esercizi/scraper?d="+day)
+    fetch("http://localhost/rovoletto/scraper?d="+day)
         .then((response) => response.json())
         .then((data) => {
             loadNav(data['Championship_day']);
@@ -22,6 +22,7 @@ function loadPage({day = ''} = {}){
 
 function loadTable(data){
     document.querySelector(".body").innerHTML = "";
+    document.querySelector(".detail").innerHTML = "";
     var tbl = document.createElement('table');
     var tbdy = document.createElement('tbody');
     for (i = 0; i < data.length; i++) {
@@ -59,14 +60,14 @@ function loadMatchDetail(squads) {
     var tbdy = document.createElement('tbody');
     var tr = document.createElement('tr');
     var td1 = document.createElement('td');
-    fetch("http://localhost/esercizi/scraper/detail.php?d="+squads['Squadra di casa'])
+    fetch("http://localhost/rovoletto/scraper/detail.php?d="+squads['Squadra di casa'])
         .then((response) => response.json())
         .then((data) => {
             td1.appendChild(buildSquadTable(data)); 
         });   
     tr.appendChild(td1);
     var td2 = document.createElement('td');
-    fetch("http://localhost/esercizi/scraper/detail.php?d="+squads['Squadra ospite'])
+    fetch("http://localhost/rovoletto/scraper/detail.php?d="+squads['Squadra ospite'])
         .then((response) => response.json())
         .then((data) => {
             td2.appendChild(buildSquadTable(data)); 
@@ -143,32 +144,6 @@ function buildSquadTable(data) {
         }
         tbdy.appendChild(tr);
     }
-
-    // for (i = 0; i < data.length; i++) {
-    //     if(i == 0){
-    //         var tr = document.createElement('tr');
-    //         for(const [key, value] of Object.entries(data[i])){
-    //             var th = document.createElement('th');
-    //             th.innerHTML = key;
-    //             tr.appendChild(th);
-    //         }
-    //         tbdy.appendChild(tr);
-    //     }
-    //     var tr = document.createElement('tr');
-    //     for(const [key, value] of Object.entries(data[i])){
-    //         var td = document.createElement('td');
-    //         if(key!= 'info'){
-    //             td.innerHTML = value;
-    //         }else{
-    //             let btn = document.createElement('button');
-    //             btn.onclick = () => {loadMatchDetail(value)};
-    //             btn.innerHTML = '&#8617;';
-    //             td.appendChild(btn); 
-    //         }
-    //         tr.appendChild(td);
-    //     }
-    //     tbdy.appendChild(tr);
-    // }
     
     tbl.appendChild(tbdy);
     return tbl;
